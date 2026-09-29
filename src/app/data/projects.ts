@@ -74,7 +74,7 @@ export const projects: Project[] = [
     route: "/projects/ai-tutoring-system",
     icon: "/images/project-icons/aitutor.png",
     description: "AI Tutoring System, developed during Hack Research 2023 and took the 1st place win in AI Healthcare, is an innovative app that uses GPT-4 and advanced data extraction techniques to enhance healthcare education. By combining web scraping, embeddings, and retrieval-augmented generation, it sets a new standard for AI-driven learning tools in the medical field.",
-    technologies: ["GPT-4", "Web Scraping", "Embeddings", "RAG", "Healthcare AI"],
+    technologies: ["GPT-4", "Web Scraping", "Embeddings", "RAG", "Healthcare AI", "Hackathon Winner"],
     demo_link: "https://youtu.be/ReinaBoNaWo",
     source_code_link: "https://github.com/yulijasso/hack-research-proj"
   },
@@ -84,7 +84,7 @@ export const projects: Project[] = [
     route: "/projects/bin-fiesta",
     icon: "/images/project-icons/binfiesta.png",
     description: "In Bin Fiesta, I developed a Google Gemini AI-powered chatbot that provides users with personalized recycling guidance, contributing to our 1st place win in Sustainability at Frontera Hacks. The project combines real-time AI interaction with a user-friendly interface built in Next.js, encouraging eco-friendly practices through accessible recycling information.",
-    technologies: ["Google Gemini AI", "Next.js", "Chatbot", "Sustainability"],
+    technologies: ["Google Gemini AI", "Next.js", "Chatbot", "Sustainability", "Hackathon Winner"],
     demo_link: "https://youtu.be/tXxWyIuusXI",
     source_code_link: "https://github.com/yulijasso/binfiesta"
   },
