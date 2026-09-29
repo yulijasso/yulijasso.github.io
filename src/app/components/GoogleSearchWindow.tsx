@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Box, Flex, HStack, Input, Text, VStack } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import RetroWindow from './RetroWindow'
-import { projects, projectHref, Project } from '../data/projects'
+import { CATEGORIES, CATEGORY_ALIASES, Category, projects, projectHref, Project } from '../data/projects'
 
 interface GoogleSearchWindowProps {
   onClose: () => void;
@@ -53,17 +53,19 @@ const tokenize = (s: string) => s.toLowerCase().split(/\W+/).filter(Boolean)
 const termPattern = (terms: string[]) => new RegExp(`\\b(${terms.join('|')})`, 'gi')
 
 // Rank projects by how many query terms hit the name, technologies, and description.
-function searchProjects(query: string): Project[] {
+function searchProjects(query: string, pool: Project[] = projects): Project[] {
   const terms = tokenize(query)
-  if (terms.length === 0) return []
+  if (terms.length === 0) return pool
   const patterns = terms.map((term) => new RegExp(`\\b${term}`, 'i'))
-  return projects
+  return pool
     .map((project) => {
       const tech = project.technologies.join(' ')
+      const category = [project.category, ...CATEGORY_ALIASES[project.category]].join(' ')
       let score = 0
       for (const re of patterns) {
         if (re.test(project.name)) score += 3
         if (re.test(tech)) score += 2
+        if (re.test(category)) score += 2
         if (re.test(project.description)) score += 1
       }
       return { project, score }
@@ -80,27 +82,79 @@ function highlight(text: string, query: string) {
   return text.split(termPattern(terms)).map((part, i) => (i % 2 === 1 ? <b key={i}>{part}</b> : part))
 }
 
+// A query that is exactly a category name or alias ("ml", "swe", ...) opens that category.
+const categoryFor = (query: string): Category | undefined =>
+  CATEGORIES.find((c) => CATEGORY_ALIASES[c].includes(query.trim().toLowerCase()))
+
 const displayUrl = (project: Project) =>
   project.route ? `www.yulijasso.com${project.route}/` : project.demo_link.replace(/^https?:\/\//, '')
 
 export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps) {
   const [input, setInput] = useState('')
+  // null query = the Google home page; '' = browsing a category with no search terms.
   const [query, setQuery] = useState<string | null>(null)
+  const [category, setCategory] = useState<Category | null>(null)
   const [elapsed, setElapsed] = useState('0.00')
 
-  const results = query ? searchProjects(query) : []
+  const pool = category ? projects.filter((p) => p.category === category) : projects
+  const results = query === null ? [] : searchProjects(query, pool)
+
+  const tick = () => setElapsed((Math.random() * 0.2 + 0.03).toFixed(2))
 
   const runSearch = (q: string) => {
     if (!q.trim()) return
-    setElapsed((Math.random() * 0.2 + 0.03).toFixed(2))
-    setQuery(q.trim())
+    tick()
+    const matched = categoryFor(q)
+    if (matched) {
+      setCategory(matched)
+      setQuery('')
+    } else {
+      // A typed search starts over across all categories; tabs narrow it afterwards.
+      setCategory(null)
+      setQuery(q.trim())
+    }
+  }
+
+  const pickCategory = (c: Category | null) => {
+    tick()
+    setCategory(c)
+    if (query === null) setQuery('')
   }
 
   const feelingLucky = () => {
-    const top = searchProjects(input)[0]
+    const top = input.trim() && !categoryFor(input) ? searchProjects(input)[0] : undefined
     if (top) window.open(projectHref(top), '_blank')
     else runSearch(input)
   }
+
+  const goHome = () => {
+    setQuery(null)
+    setCategory(null)
+    setInput('')
+  }
+
+  const categoryTabs = (
+    <HStack spacing={3} fontSize="12px" flexWrap="wrap" justify="center">
+      {[null, ...CATEGORIES].map((c) => {
+        const active = query !== null && category === c
+        return (
+          <Text
+            key={c ?? 'all'}
+            as="span"
+            cursor="pointer"
+            fontWeight={active ? 'bold' : 'normal'}
+            color={active ? '#000' : '#00c'}
+            textDecoration={active ? 'none' : 'underline'}
+            onClick={() => pickCategory(c)}
+          >
+            {c ?? 'All'}
+          </Text>
+        )
+      })}
+    </HStack>
+  )
+
+  const searchLabel = query ? (category ? `${query} in ${category}` : query) : category ?? 'all projects'
 
   const searchBox = (width: string) => (
     <Input
@@ -128,15 +182,16 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
             <Flex bg="#C0C0C0" px={2} py={1} align="center" gap={2} borderBottom="1px solid #808080" fontSize="11px">
               <Text>Address</Text>
               <Box flex="1" bg="#fff" border="2px inset #808080" px={1} whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
-                {query
-                  ? `http://www.google.com/search?q=${encodeURIComponent(query).replace(/%20/g, '+')}`
-                  : 'http://www.google.com/'}
+                {query === null
+                  ? 'http://www.google.com/'
+                  : `http://www.google.com/search?q=${encodeURIComponent(query).replace(/%20/g, '+')}${category ? `&cat=${encodeURIComponent(category)}` : ''}`}
               </Box>
             </Flex>
 
             {query === null ? (
               <VStack spacing={4} pt={12} pb={8}>
                 <GoogleLogo size="72px" />
+                {categoryTabs}
                 <Text fontSize="12px" color="#555">Searching Yuli&apos;s {projects.length} projects</Text>
                 {searchBox('360px')}
                 <HStack spacing={2}>
@@ -144,40 +199,43 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
                   <RetroButton onClick={feelingLucky}>I&apos;m Feeling Lucky</RetroButton>
                 </HStack>
                 <Text fontSize="11px" color="#555" pt={6}>
-                  Try: <Text as="span" color="#00c" textDecoration="underline" cursor="pointer" onClick={() => { setInput('AI'); runSearch('AI') }}>AI</Text>
+                  Try: <Text as="span" color="#00c" textDecoration="underline" cursor="pointer" onClick={() => { setInput('RAG'); runSearch('RAG') }}>RAG</Text>
                   {' · '}
                   <Text as="span" color="#00c" textDecoration="underline" cursor="pointer" onClick={() => { setInput('hackathon'); runSearch('hackathon') }}>hackathon</Text>
                   {' · '}
-                  <Text as="span" color="#00c" textDecoration="underline" cursor="pointer" onClick={() => { setInput('deep learning'); runSearch('deep learning') }}>deep learning</Text>
+                  <Text as="span" color="#00c" textDecoration="underline" cursor="pointer" onClick={() => { setInput('chrome extension'); runSearch('chrome extension') }}>chrome extension</Text>
                 </Text>
                 <Text fontSize="10px" color="#777" pt={4}>©2001 Google</Text>
               </VStack>
             ) : (
               <Box px={3} py={3}>
                 <HStack spacing={3} align="center" mb={3}>
-                  <Box cursor="pointer" onClick={() => { setQuery(null); setInput('') }}>
+                  <Box cursor="pointer" onClick={goHome}>
                     <GoogleLogo size="32px" />
                   </Box>
                   {searchBox('260px')}
                   <RetroButton onClick={() => runSearch(input)}>Google Search</RetroButton>
                 </HStack>
 
+                <Box mb={2}>{categoryTabs}</Box>
+
                 <Flex bg="#E5ECF9" borderTop="1px solid #3366CC" px={2} py={1} justify="space-between" fontSize="12px" mb={3}>
-                  <Text fontWeight="bold">Web</Text>
+                  <Text fontWeight="bold">{category ?? 'Web'}</Text>
                   {results.length > 0 && (
                     <Text>
-                      Results <b>1</b> - <b>{results.length}</b> of about <b>{results.length}</b> for <b>{query}</b>. ({elapsed} seconds)
+                      Results <b>1</b> - <b>{results.length}</b> of about <b>{results.length}</b> for <b>{searchLabel}</b>. ({elapsed} seconds)
                     </Text>
                   )}
                 </Flex>
 
                 {results.length === 0 ? (
                   <Box fontSize="13px" px={2}>
-                    <Text mb={2}>Your search - <b>{query}</b> - did not match any projects.</Text>
+                    <Text mb={2}>Your search - <b>{searchLabel}</b> - did not match any projects.</Text>
                     <Text>Suggestions:</Text>
                     <Box as="ul" pl={6}>
                       <li>Make sure all words are spelled correctly.</li>
-                      <li>Try different keywords, like &quot;AI&quot;, &quot;CNN&quot;, or &quot;Next.js&quot;.</li>
+                      <li>Try different keywords, like &quot;RAG&quot;, &quot;CNN&quot;, or &quot;Next.js&quot;.</li>
+                      {category && <li>Search in <Text as="span" color="#00c" textDecoration="underline" cursor="pointer" onClick={() => pickCategory(null)}>All</Text> categories.</li>}
                     </Box>
                   </Box>
                 ) : (
@@ -196,7 +254,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
                         </Text>
                         <Text color="#000" noOfLines={2}>{highlight(project.description, query)}</Text>
                         <Text color="#008000" fontSize="12px">
-                          {displayUrl(project)} - {project.technologies.join(', ')}
+                          {project.category} - {displayUrl(project)} - {project.technologies.join(', ')}
                         </Text>
                       </Box>
                     ))}
