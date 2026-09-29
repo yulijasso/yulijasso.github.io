@@ -60,12 +60,12 @@ function searchProjects(query: string, pool: Project[] = projects): Project[] {
   return pool
     .map((project) => {
       const tech = project.technologies.join(' ')
-      const category = [project.category, ...CATEGORY_ALIASES[project.category]].join(' ')
+      const categories = project.categories.flatMap((c) => [c, ...CATEGORY_ALIASES[c]]).join(' ')
       let score = 0
       for (const re of patterns) {
         if (re.test(project.name)) score += 3
         if (re.test(tech)) score += 2
-        if (re.test(category)) score += 2
+        if (re.test(categories)) score += 2
         if (re.test(project.description)) score += 1
       }
       return { project, score }
@@ -96,7 +96,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
   const [category, setCategory] = useState<Category | null>(null)
   const [elapsed, setElapsed] = useState('0.00')
 
-  const pool = category ? projects.filter((p) => p.category === category) : projects
+  const pool = category ? projects.filter((p) => p.categories.includes(category)) : projects
   const results = query === null ? [] : searchProjects(query, pool)
 
   const tick = () => setElapsed((Math.random() * 0.2 + 0.03).toFixed(2))
@@ -254,7 +254,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
                         </Text>
                         <Text color="#000" noOfLines={2}>{highlight(project.description, query)}</Text>
                         <Text color="#008000" fontSize="12px">
-                          {project.category} - {displayUrl(project)} - {project.technologies.join(', ')}
+                          {project.categories.join(' / ')} - {displayUrl(project)} - {project.technologies.join(', ')}
                         </Text>
                       </Box>
                     ))}

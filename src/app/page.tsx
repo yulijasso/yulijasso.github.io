@@ -416,7 +416,7 @@ export default function Home() {
         </motion.div>
         <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 440, left: 20 }}>
           <DesktopIcon
-            icon={<Image src="/images/google-icon.svg" alt="Google Icon" width={40} height={40} />}
+            icon={<Image src="/images/google-chrome-icon.png" alt="Google Icon" width={40} height={40} />}
             label="Google"
             onClick={openGoogle}
           />
@@ -518,7 +518,7 @@ export default function Home() {
                         {category}
                       </Text>
                       <SimpleGrid columns={[1, 2, 3]} spacing={4}>
-                        {projects.filter((p) => p.category === category).map((project) => (
+                        {projects.filter((p) => p.categories.includes(category)).map((project) => (
                           <VStack
                             key={project.source_code_link + project.name}
                             spacing={2}
