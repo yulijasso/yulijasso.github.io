@@ -18,7 +18,7 @@ import { db } from '../../firebase.js';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import RetroWindow from './components/RetroWindow';
 import GoogleSearchWindow from './components/GoogleSearchWindow';
-import { projects } from './data/projects';
+import { projects, projectHref, DEFAULT_PROJECT_ICON } from './data/projects';
 
 interface Question {
   id: number;
@@ -515,14 +515,14 @@ export default function Home() {
                   <SimpleGrid columns={[1, 2, 3]} spacing={4}>
                     {projects.map((project) => (
                       <VStack
-                        key={project.route}
+                        key={project.source_code_link + project.name}
                         spacing={2}
                         cursor="pointer"
-                        onClick={() => window.open(project.route, '_blank')}
+                        onClick={() => window.open(projectHref(project), '_blank')}
                         _hover={{ transform: 'scale(1.05)' }}
                         transition="transform 0.2s"
                       >
-                        <Image src={project.icon} alt={`${project.name} Icon`} width={48} height={48} />
+                        <Image src={project.icon ?? DEFAULT_PROJECT_ICON} alt={`${project.name} Icon`} width={48} height={48} />
                         <Text fontSize="12px" fontWeight="bold" textAlign="center" color="#000">
                           {project.name}
                         </Text>

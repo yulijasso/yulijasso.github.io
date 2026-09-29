@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Box, Flex, HStack, Input, Text, VStack } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
 import RetroWindow from './RetroWindow'
-import { projects, Project } from '../data/projects'
+import { projects, projectHref, Project } from '../data/projects'
 
 interface GoogleSearchWindowProps {
   onClose: () => void;
@@ -49,20 +49,22 @@ const RetroButton = ({ children, onClick }: { children: React.ReactNode; onClick
 
 const tokenize = (s: string) => s.toLowerCase().split(/\W+/).filter(Boolean)
 
+// Terms match at the start of a word, so "rag" finds "RAG" but not "leveraging".
+const termPattern = (terms: string[]) => new RegExp(`\\b(${terms.join('|')})`, 'gi')
+
 // Rank projects by how many query terms hit the name, technologies, and description.
 function searchProjects(query: string): Project[] {
   const terms = tokenize(query)
   if (terms.length === 0) return []
+  const patterns = terms.map((term) => new RegExp(`\\b${term}`, 'i'))
   return projects
     .map((project) => {
-      const name = project.name.toLowerCase()
-      const tech = project.technologies.join(' ').toLowerCase()
-      const desc = project.description.toLowerCase()
+      const tech = project.technologies.join(' ')
       let score = 0
-      for (const term of terms) {
-        if (name.includes(term)) score += 3
-        if (tech.includes(term)) score += 2
-        if (desc.includes(term)) score += 1
+      for (const re of patterns) {
+        if (re.test(project.name)) score += 3
+        if (re.test(tech)) score += 2
+        if (re.test(project.description)) score += 1
       }
       return { project, score }
     })
@@ -73,11 +75,13 @@ function searchProjects(query: string): Project[] {
 
 // Bold every occurrence of a query term, like the old results snippets.
 function highlight(text: string, query: string) {
-  const terms = tokenize(query).map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  const terms = tokenize(query)
   if (terms.length === 0) return text
-  const re = new RegExp(`(${terms.join('|')})`, 'gi')
-  return text.split(re).map((part, i) => (i % 2 === 1 ? <b key={i}>{part}</b> : part))
+  return text.split(termPattern(terms)).map((part, i) => (i % 2 === 1 ? <b key={i}>{part}</b> : part))
 }
+
+const displayUrl = (project: Project) =>
+  project.route ? `www.yulijasso.com${project.route}/` : project.demo_link.replace(/^https?:\/\//, '')
 
 export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps) {
   const [input, setInput] = useState('')
@@ -94,7 +98,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
 
   const feelingLucky = () => {
     const top = searchProjects(input)[0]
-    if (top) window.open(top.route, '_blank')
+    if (top) window.open(projectHref(top), '_blank')
     else runSearch(input)
   }
 
@@ -179,10 +183,10 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
                 ) : (
                   <VStack align="stretch" spacing={4} px={2}>
                     {results.map((project) => (
-                      <Box key={project.route} fontSize="13px">
+                      <Box key={project.source_code_link + project.name} fontSize="13px">
                         <Text
                           as="a"
-                          href={project.route}
+                          href={projectHref(project)}
                           target="_blank"
                           color="#00c"
                           textDecoration="underline"
@@ -192,7 +196,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
                         </Text>
                         <Text color="#000" noOfLines={2}>{highlight(project.description, query)}</Text>
                         <Text color="#008000" fontSize="12px">
-                          www.yulijasso.com{project.route}/ - {project.technologies.join(', ')}
+                          {displayUrl(project)} - {project.technologies.join(', ')}
                         </Text>
                       </Box>
                     ))}
