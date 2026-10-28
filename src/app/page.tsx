@@ -18,6 +18,8 @@ import { db } from '../../firebase.js';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import RetroWindow from './components/RetroWindow';
 import GoogleSearchWindow from './components/GoogleSearchWindow';
+import WindowFrame from './components/WindowFrame';
+import useIsMobile from './hooks/useIsMobile';
 import { CATEGORIES, projects, projectHref, DEFAULT_PROJECT_ICON } from './data/projects';
 
 interface Question {
@@ -46,6 +48,11 @@ const blind75Questions: Question[] = [
     difficulty: "Hard",
     link: "https://leetcode.com/problems/median-of-two-sorted-arrays/",
   },
+];
+
+const RESUMES = [
+  { label: 'SWE', file: '/Yuliana_Jasso_SWE_December_2027.pdf' },
+  { label: 'AI / ML', file: '/Yuliana_Jasso_Resume_AI_ML_December_2027.pdf' },
 ];
 
 const DesktopIcon = ({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) => {
@@ -162,6 +169,7 @@ export default function Home() {
   const [showContact, setShowContact] = useState(false);
   const [showPortfolio, setShowPortfolio] = useState(false);
   const [showGoogle, setShowGoogle] = useState(false);
+  const [resume, setResume] = useState(RESUMES[0]);
 
   const [petHappiness, setPetHappiness] = useState(100);
   const [happinessLoading, setHappinessLoading] = useState(true);
@@ -173,6 +181,7 @@ export default function Home() {
   const [recentItems, setRecentItems] = useState<Array<{ label: string; action: () => void }>>([]);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const isMobile = useIsMobile();
 
   const typewriterText = `Welcome to My Portfolio\n\nI’m Yuli — AI Software Engineer & Creative Coder\n\nI'm a passionate software engineer who loves building innovative web applications. This portfolio showcases my journey through a unique 2000s-style desktop interface.`;
 
@@ -301,40 +310,67 @@ export default function Home() {
     ]);
   };
 
+  // Mobile windows fill the screen, so only one is open at a time.
+  const closeWindowsOnMobile = () => {
+    if (!isMobile) return;
+    setShowIntro(false);
+    setShowTamagotchi(false);
+    setShowMinesweeper(false);
+    setShowResume(false);
+    setShowContact(false);
+    setShowPortfolio(false);
+    setShowGoogle(false);
+  };
+
   const openResume = () => {
+    closeWindowsOnMobile();
     console.log('openResume called');
     setShowResume(true);
     addRecentItem('Resume.pdf', openResume);
   };
 
   const openContact = () => {
+    closeWindowsOnMobile();
     console.log('openContact called');
     setShowContact(true);
     addRecentItem('Contact', openContact);
   };
 
   const openTamagotchi = () => {
+    closeWindowsOnMobile();
     console.log('openTamagotchi called');
     setShowTamagotchi(true);
     addRecentItem('Tamagotchi', openTamagotchi);
   };
 
   const openMinesweeper = () => {
+    closeWindowsOnMobile();
     console.log('openMinesweeper called');
     setShowMinesweeper(true);
     addRecentItem('Minesweeper', openMinesweeper);
   };
 
   const openPortfolio = () => {
+    closeWindowsOnMobile();
     console.log('openPortfolio called');
     setShowPortfolio(true);
     addRecentItem('Portfolio', openPortfolio);
   };
 
   const openGoogle = () => {
+    closeWindowsOnMobile();
     setShowGoogle(true);
     addRecentItem('Google', openGoogle);
   };
+
+  const desktopIcons = [
+    { icon: <Image src="/images/tamagotchi-icon.png" alt="Tamagotchi Icon" width={40} height={40} />, label: 'Tamagotchi', onClick: openTamagotchi },
+    { icon: <Image src="/images/resume-pdf.png" alt="Resume PDF Icon" width={40} height={40} />, label: 'Resume.pdf', onClick: openResume },
+    { icon: <Image src="/images/portfolio-icon.png" alt="Projects Icon" width={40} height={40} />, label: 'Projects', onClick: openPortfolio },
+    { icon: <Image src="/images/contact-icon.png" alt="Contact Icon" width={40} height={40} />, label: 'Contact', onClick: openContact },
+    { icon: <Image src="/images/minesweeper-icon.png" alt="Minesweeper Icon" width={40} height={40} />, label: 'Minesweeper', onClick: openMinesweeper },
+    { icon: <Image src="/images/google-chrome-icon.png" alt="Google Icon" width={40} height={40} />, label: 'Google', onClick: openGoogle },
+  ];
 
   const getScreen = () => {
     if (happinessLoading) {
@@ -378,84 +414,56 @@ export default function Home() {
       position="relative"
       pb="80px"
     >
-      <Box position="relative" width="100vw" height="100vh" zIndex={15}>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 40, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/tamagotchi-icon.png" alt="Tamagotchi Icon" width={40} height={40} />}
-            label="Tamagotchi"
-            onClick={openTamagotchi}
-          />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 120, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/resume-pdf.png" alt="Resume PDF Icon" width={40} height={40} />}
-            label="Resume.pdf"
-            onClick={openResume}
-          />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 200, left: 20 }}>
-          <DesktopIcon
-              icon={<Image src="/images/portfolio-icon.png" alt="Projects Icon" width={40} height={40} />}
-              label="Projects"
-              onClick={openPortfolio}
-            />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 280, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/contact-icon.png" alt="Contact Icon" width={40} height={40} />}
-            label="Contact"
-            onClick={openContact}
-          />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 360, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/minesweeper-icon.png" alt="Minesweeper Icon" width={40} height={40} />}
-            label="Minesweeper"
-            onClick={openMinesweeper}
-          />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 440, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/google-chrome-icon.png" alt="Google Icon" width={40} height={40} />}
-            label="Google"
-            onClick={openGoogle}
-          />
-        </motion.div>
-      </Box>
+      {isMobile ? (
+        <SimpleGrid columns={3} spacing={4} p={4} position="relative" zIndex={15} justifyItems="center">
+          {desktopIcons.map((item) => (
+            <DesktopIcon key={item.label} {...item} />
+          ))}
+        </SimpleGrid>
+      ) : (
+        <Box position="relative" width="100vw" height="100vh" zIndex={15}>
+          {desktopIcons.map((item, i) => (
+            <motion.div key={item.label} drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 40 + i * 80, left: 20 }}>
+              <DesktopIcon {...item} />
+            </motion.div>
+          ))}
+        </Box>
+      )}
 
       {showIntro && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 60, left: 320, zIndex: 20 }}>
-          <Box w="420px">
-            {renderIntro()}
-          </Box>
-        </motion.div>
+        <WindowFrame top={60} left={320} width="420px">
+          {renderIntro()}
+        </WindowFrame>
       )}
 
       {showTamagotchi && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 260, left: 440, zIndex: 20 }}>
-          <Box w="420px">
-            <RetroWindow title="Tamagotchi" onClose={() => setShowTamagotchi(false)}>
-              {getScreen()}
-            </RetroWindow>
-          </Box>
-        </motion.div>
+        <WindowFrame top={260} left={440} width="420px">
+          <RetroWindow title="Tamagotchi" onClose={() => setShowTamagotchi(false)}>
+            {getScreen()}
+          </RetroWindow>
+        </WindowFrame>
       )}
 
       {showResume && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 220, left: 400, zIndex: 20 }}>
-          <Box w="900px" h="700px">
-            <RetroWindow title="Resume.pdf" onClose={() => setShowResume(false)}>
-              <Button size="sm" bg="#E0E0E0" color="#000" border="2px outset #808080" borderRadius="0" fontFamily="'Microsoft Sans Serif', sans-serif" fontSize="10px" mb={2} _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }} onClick={() => window.open('/Resume.pdf', '_blank')}>View in New Tab</Button>
-              <iframe src="/Resume.pdf" width="100%" height="100%" style={{ border: "none" }} />
-            </RetroWindow>
-          </Box>
-        </motion.div>
+        <WindowFrame top={220} left={400} width="900px" height="700px">
+          <RetroWindow title="Resume.pdf" onClose={() => setShowResume(false)}>
+            <Flex direction="column" h="100%">
+              <HStack spacing={2} mb={2} flexWrap="wrap">
+                {RESUMES.map((r) => (
+                  <Button key={r.file} size="sm" bg={resume.file === r.file ? '#D0D0D0' : '#E0E0E0'} color="#000" border={resume.file === r.file ? '2px inset #808080' : '2px outset #808080'} borderRadius="0" fontFamily="'Microsoft Sans Serif', sans-serif" fontSize="10px" _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }} onClick={() => setResume(r)}>{r.label}</Button>
+                ))}
+                <Button size="sm" bg="#E0E0E0" color="#000" border="2px outset #808080" borderRadius="0" fontFamily="'Microsoft Sans Serif', sans-serif" fontSize="10px" _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }} onClick={() => window.open(resume.file, '_blank')}>View in New Tab</Button>
+              </HStack>
+              <iframe key={resume.file} src={resume.file} width="100%" style={{ border: "none", flex: 1 }} />
+            </Flex>
+          </RetroWindow>
+        </WindowFrame>
       )}
 
       {showContact && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 180, left: 360, zIndex: 20 }}>
-          <Box>
-            <Box w="400px" h="300px" bg="#C0C0C0" border="2px solid #808080" boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF" display="flex" flexDirection="column">
+        <WindowFrame top={180} left={360} width="400px" height="300px">
+          <Box h="100%">
+            <Box w="100%" h="100%" bg="#C0C0C0" border="2px solid #808080" boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF" display="flex" flexDirection="column">
               <Flex bg="#1A3CA7" color="#fff" px={3} py={1} justify="space-between" align="center" borderBottom="2px solid #808080" boxShadow="inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #B84878">
                 <Text fontSize="14px" fontWeight="bold" textShadow="1px 1px #000">💌 Contact</Text>
                 <Box
@@ -478,13 +486,13 @@ export default function Home() {
               </Box>
             </Box>
           </Box>
-        </motion.div>
+        </WindowFrame>
       )}
 
       {showPortfolio && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 120, left: 320, zIndex: 20 }}>
-          <Box>
-            <Box w="800px" h="600px" bg="#C0C0C0" border="2px solid #808080" boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF" display="flex" flexDirection="column">
+        <WindowFrame top={120} left={320} width="800px" height="600px">
+          <Box h="100%">
+            <Box w="100%" h="100%" bg="#C0C0C0" border="2px solid #808080" boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF" display="flex" flexDirection="column">
               <Flex bg="#1A3CA7" color="#fff" px={3} py={1} justify="space-between" align="center" borderBottom="2px solid #808080" boxShadow="inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #B84878">
                 <Text fontSize="14px" fontWeight="bold" textShadow="1px 1px #000">🗂️ Projects</Text>
                 <Box
@@ -540,7 +548,7 @@ export default function Home() {
               </Box>
             </Box>
           </Box>
-        </motion.div>
+        </WindowFrame>
       )}
 
 

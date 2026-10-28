@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Box, Flex, HStack, Input, Text, VStack } from '@chakra-ui/react'
-import { motion } from 'framer-motion'
 import RetroWindow from './RetroWindow'
+import WindowFrame from './WindowFrame'
 import { CATEGORIES, CATEGORY_ALIASES, Category, projects, projectHref, Project } from '../data/projects'
 
 interface GoogleSearchWindowProps {
@@ -162,6 +162,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
       onChange={(e) => setInput(e.target.value)}
       onKeyDown={(e) => e.key === 'Enter' && runSearch(input)}
       w={width}
+      maxW="100%"
       h="26px"
       bg="#fff"
       color="#000"
@@ -175,8 +176,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
   )
 
   return (
-    <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 100, left: 360, zIndex: 20 }}>
-      <Box w="640px" h="480px">
+    <WindowFrame top={100} left={360} width="640px" height="480px">
         <RetroWindow title="Google - Microsoft Internet Explorer" onClose={onClose}>
           <Box bg="#fff" m={-4} minH="calc(100% + 32px)" fontFamily="Arial, sans-serif" color="#000">
             <Flex bg="#C0C0C0" px={2} py={1} align="center" gap={2} borderBottom="1px solid #808080" fontSize="11px">
@@ -209,7 +209,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
               </VStack>
             ) : (
               <Box px={3} py={3}>
-                <HStack spacing={3} align="center" mb={3}>
+                <HStack spacing={3} align="center" mb={3} flexWrap="wrap">
                   <Box cursor="pointer" onClick={goHome}>
                     <GoogleLogo size="32px" />
                   </Box>
@@ -219,7 +219,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
 
                 <Box mb={2}>{categoryTabs}</Box>
 
-                <Flex bg="#E5ECF9" borderTop="1px solid #3366CC" px={2} py={1} justify="space-between" fontSize="12px" mb={3}>
+                <Flex bg="#E5ECF9" borderTop="1px solid #3366CC" px={2} py={1} justify="space-between" flexWrap="wrap" gap={1} fontSize="12px" mb={3}>
                   <Text fontWeight="bold">{category ?? 'Web'}</Text>
                   {results.length > 0 && (
                     <Text>
@@ -278,7 +278,6 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
             )}
           </Box>
         </RetroWindow>
-      </Box>
-    </motion.div>
+    </WindowFrame>
   )
 }
