@@ -139,7 +139,7 @@ export default function MinesweeperWindow({ onClose, addPoints }: MinesweeperWin
   }
 
   return (
-    <Box position="absolute" top="30%" left="40%" transform="translate(-50%, -50%)" zIndex={30}>
+    <Box position="absolute" top={{ base: '40%', md: '30%' }} left={{ base: '50%', md: '40%' }} transform="translate(-50%, -50%)" zIndex={30}>
       <motion.div drag dragConstraints={{ top: -1000, bottom: 1000, left: -1000, right: 1000 }}>
         <Box
           w="250px"

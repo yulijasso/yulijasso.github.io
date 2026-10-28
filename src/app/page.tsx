@@ -17,6 +17,10 @@ import { motion } from 'framer-motion';
 import { db } from '../../firebase.js';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import RetroWindow from './components/RetroWindow';
+import GoogleSearchWindow from './components/GoogleSearchWindow';
+import WindowFrame from './components/WindowFrame';
+import useIsMobile from './hooks/useIsMobile';
+import { CATEGORIES, projects, projectHref, DEFAULT_PROJECT_ICON } from './data/projects';
 
 interface Question {
   id: number;
@@ -44,6 +48,11 @@ const blind75Questions: Question[] = [
     difficulty: "Hard",
     link: "https://leetcode.com/problems/median-of-two-sorted-arrays/",
   },
+];
+
+const RESUMES = [
+  { label: 'SWE', file: '/Yuliana_Jasso_SWE_December_2027.pdf' },
+  { label: 'AI / ML', file: '/Yuliana_Jasso_Resume_AI_ML_December_2027.pdf' },
 ];
 
 const DesktopIcon = ({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) => {
@@ -159,6 +168,8 @@ export default function Home() {
   const [showResume, setShowResume] = useState(false);
   const [showContact, setShowContact] = useState(false);
   const [showPortfolio, setShowPortfolio] = useState(false);
+  const [showGoogle, setShowGoogle] = useState(false);
+  const [resume, setResume] = useState(RESUMES[0]);
 
   const [petHappiness, setPetHappiness] = useState(100);
   const [happinessLoading, setHappinessLoading] = useState(true);
@@ -170,6 +181,7 @@ export default function Home() {
   const [recentItems, setRecentItems] = useState<Array<{ label: string; action: () => void }>>([]);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const isMobile = useIsMobile();
 
   const typewriterText = `Welcome to My Portfolio\n\nI’m Yuli — AI Software Engineer & Creative Coder\n\nI'm a passionate software engineer who loves building innovative web applications. This portfolio showcases my journey through a unique 2000s-style desktop interface.`;
 
@@ -298,35 +310,67 @@ export default function Home() {
     ]);
   };
 
+  // Mobile windows fill the screen, so only one is open at a time.
+  const closeWindowsOnMobile = () => {
+    if (!isMobile) return;
+    setShowIntro(false);
+    setShowTamagotchi(false);
+    setShowMinesweeper(false);
+    setShowResume(false);
+    setShowContact(false);
+    setShowPortfolio(false);
+    setShowGoogle(false);
+  };
+
   const openResume = () => {
+    closeWindowsOnMobile();
     console.log('openResume called');
     setShowResume(true);
     addRecentItem('Resume.pdf', openResume);
   };
 
   const openContact = () => {
+    closeWindowsOnMobile();
     console.log('openContact called');
     setShowContact(true);
     addRecentItem('Contact', openContact);
   };
 
   const openTamagotchi = () => {
+    closeWindowsOnMobile();
     console.log('openTamagotchi called');
     setShowTamagotchi(true);
     addRecentItem('Tamagotchi', openTamagotchi);
   };
 
   const openMinesweeper = () => {
+    closeWindowsOnMobile();
     console.log('openMinesweeper called');
     setShowMinesweeper(true);
     addRecentItem('Minesweeper', openMinesweeper);
   };
 
   const openPortfolio = () => {
+    closeWindowsOnMobile();
     console.log('openPortfolio called');
     setShowPortfolio(true);
     addRecentItem('Portfolio', openPortfolio);
   };
+
+  const openGoogle = () => {
+    closeWindowsOnMobile();
+    setShowGoogle(true);
+    addRecentItem('Google', openGoogle);
+  };
+
+  const desktopIcons = [
+    { icon: <Image src="/images/tamagotchi-icon.png" alt="Tamagotchi Icon" width={40} height={40} />, label: 'Tamagotchi', onClick: openTamagotchi },
+    { icon: <Image src="/images/resume-pdf.png" alt="Resume PDF Icon" width={40} height={40} />, label: 'Resume.pdf', onClick: openResume },
+    { icon: <Image src="/images/portfolio-icon.png" alt="Projects Icon" width={40} height={40} />, label: 'Projects', onClick: openPortfolio },
+    { icon: <Image src="/images/contact-icon.png" alt="Contact Icon" width={40} height={40} />, label: 'Contact', onClick: openContact },
+    { icon: <Image src="/images/minesweeper-icon.png" alt="Minesweeper Icon" width={40} height={40} />, label: 'Minesweeper', onClick: openMinesweeper },
+    { icon: <Image src="/images/google-chrome-icon.png" alt="Google Icon" width={40} height={40} />, label: 'Google', onClick: openGoogle },
+  ];
 
   const getScreen = () => {
     if (happinessLoading) {
@@ -370,77 +414,56 @@ export default function Home() {
       position="relative"
       pb="80px"
     >
-      <Box position="relative" width="100vw" height="100vh" zIndex={15}>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 40, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/tamagotchi-icon.png" alt="Tamagotchi Icon" width={40} height={40} />}
-            label="Tamagotchi"
-            onClick={openTamagotchi}
-          />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 120, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/resume-pdf.png" alt="Resume PDF Icon" width={40} height={40} />}
-            label="Resume.pdf"
-            onClick={openResume}
-          />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 200, left: 20 }}>
-          <DesktopIcon
-              icon={<Image src="/images/portfolio-icon.png" alt="Projects Icon" width={40} height={40} />}
-              label="Projects"
-              onClick={openPortfolio}
-            />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 280, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/contact-icon.png" alt="Contact Icon" width={40} height={40} />}
-            label="Contact"
-            onClick={openContact}
-          />
-        </motion.div>
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 360, left: 20 }}>
-          <DesktopIcon
-            icon={<Image src="/images/minesweeper-icon.png" alt="Minesweeper Icon" width={40} height={40} />}
-            label="Minesweeper"
-            onClick={openMinesweeper}
-          />
-        </motion.div>
-      </Box>
+      {isMobile ? (
+        <SimpleGrid columns={3} spacing={4} p={4} position="relative" zIndex={15} justifyItems="center">
+          {desktopIcons.map((item) => (
+            <DesktopIcon key={item.label} {...item} />
+          ))}
+        </SimpleGrid>
+      ) : (
+        <Box position="relative" width="100vw" height="100vh" zIndex={15}>
+          {desktopIcons.map((item, i) => (
+            <motion.div key={item.label} drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 40 + i * 80, left: 20 }}>
+              <DesktopIcon {...item} />
+            </motion.div>
+          ))}
+        </Box>
+      )}
 
       {showIntro && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 60, left: 320, zIndex: 20 }}>
-          <Box w="420px">
-            {renderIntro()}
-          </Box>
-        </motion.div>
+        <WindowFrame top={60} left={320} width="420px">
+          {renderIntro()}
+        </WindowFrame>
       )}
 
       {showTamagotchi && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 260, left: 440, zIndex: 20 }}>
-          <Box w="420px">
-            <RetroWindow title="Tamagotchi" onClose={() => setShowTamagotchi(false)}>
-              {getScreen()}
-            </RetroWindow>
-          </Box>
-        </motion.div>
+        <WindowFrame top={260} left={440} width="420px">
+          <RetroWindow title="Tamagotchi" onClose={() => setShowTamagotchi(false)}>
+            {getScreen()}
+          </RetroWindow>
+        </WindowFrame>
       )}
 
       {showResume && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 220, left: 400, zIndex: 20 }}>
-          <Box w="900px" h="700px">
-            <RetroWindow title="Resume.pdf" onClose={() => setShowResume(false)}>
-              <Button size="sm" bg="#E0E0E0" color="#000" border="2px outset #808080" borderRadius="0" fontFamily="'Microsoft Sans Serif', sans-serif" fontSize="10px" mb={2} _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }} onClick={() => window.open('/Resume.pdf', '_blank')}>View in New Tab</Button>
-              <iframe src="/Resume.pdf" width="100%" height="100%" style={{ border: "none" }} />
-            </RetroWindow>
-          </Box>
-        </motion.div>
+        <WindowFrame top={220} left={400} width="900px" height="700px">
+          <RetroWindow title="Resume.pdf" onClose={() => setShowResume(false)}>
+            <Flex direction="column" h="100%">
+              <HStack spacing={2} mb={2} flexWrap="wrap">
+                {RESUMES.map((r) => (
+                  <Button key={r.file} size="sm" bg={resume.file === r.file ? '#D0D0D0' : '#E0E0E0'} color="#000" border={resume.file === r.file ? '2px inset #808080' : '2px outset #808080'} borderRadius="0" fontFamily="'Microsoft Sans Serif', sans-serif" fontSize="10px" _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }} onClick={() => setResume(r)}>{r.label}</Button>
+                ))}
+                <Button size="sm" bg="#E0E0E0" color="#000" border="2px outset #808080" borderRadius="0" fontFamily="'Microsoft Sans Serif', sans-serif" fontSize="10px" _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }} onClick={() => window.open(resume.file, '_blank')}>View in New Tab</Button>
+              </HStack>
+              <iframe key={resume.file} src={resume.file} width="100%" style={{ border: "none", flex: 1 }} />
+            </Flex>
+          </RetroWindow>
+        </WindowFrame>
       )}
 
       {showContact && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 180, left: 360, zIndex: 20 }}>
-          <Box>
-            <Box w="400px" h="300px" bg="#C0C0C0" border="2px solid #808080" boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF" display="flex" flexDirection="column">
+        <WindowFrame top={180} left={360} width="400px" height="300px">
+          <Box h="100%">
+            <Box w="100%" h="100%" bg="#C0C0C0" border="2px solid #808080" boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF" display="flex" flexDirection="column">
               <Flex bg="#1A3CA7" color="#fff" px={3} py={1} justify="space-between" align="center" borderBottom="2px solid #808080" boxShadow="inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #B84878">
                 <Text fontSize="14px" fontWeight="bold" textShadow="1px 1px #000">💌 Contact</Text>
                 <Box
@@ -463,13 +486,13 @@ export default function Home() {
               </Box>
             </Box>
           </Box>
-        </motion.div>
+        </WindowFrame>
       )}
 
       {showPortfolio && (
-        <motion.div drag dragMomentum={false} dragElastic={0} style={{ position: 'absolute', top: 120, left: 320, zIndex: 20 }}>
-          <Box>
-            <Box w="800px" h="600px" bg="#C0C0C0" border="2px solid #808080" boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF" display="flex" flexDirection="column">
+        <WindowFrame top={120} left={320} width="800px" height="600px">
+          <Box h="100%">
+            <Box w="100%" h="100%" bg="#C0C0C0" border="2px solid #808080" boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF" display="flex" flexDirection="column">
               <Flex bg="#1A3CA7" color="#fff" px={3} py={1} justify="space-between" align="center" borderBottom="2px solid #808080" boxShadow="inset 1px 1px 0 #FFFFFF, inset -1px -1px 0 #B84878">
                 <Text fontSize="14px" fontWeight="bold" textShadow="1px 1px #000">🗂️ Projects</Text>
                 <Box
@@ -497,145 +520,43 @@ export default function Home() {
                     </Text>
                   </Box>
                   
-                  <SimpleGrid columns={[1, 2, 3]} spacing={4}>
-                    {[
-                      { 
-                        name: "AI Autotab Chrome Extension", 
-                        emoji: "/images/project-icons/chromext.png",
-                        description: "Created an AI Autotab chrome extension that autocompletes phrases and sentences, improving productivity",
-                        technologies: ["Chrome Extension", "AI", "Productivity", "JavaScript"],
-                        demo_link: "https://github.com/yuyi444/ai-autotab-extension",
-                        source_code_link: "https://github.com/yuyi444/ai-autotab-extension"
-                      },
-                      { 
-                        name: "AI Code Editor", 
-                        emoji: "/images/project-icons/aicodeditor.png",
-                        description: "Integrated an AI tutor that improves user productivity and promotes in-platform learning in code editor app, Judge00. Integrated key features, such as OpenRouter API key input, line explanations, and automatic changes from AI tutor to IDE",
-                        technologies: ["AI Tutor", "Code Editor", "OpenRouter API", "IDE Integration"],
-                        demo_link: "https://github.com/yuyi444/ai-code-editor",
-                        source_code_link: "https://github.com/yuyi444/ai-code-editor"
-                      },
-                      { 
-                        name: "AI Search Engine", 
-                        emoji: "/images/project-icons/searchengine.png",
-                        description: "Created a tool that scrapes web content and provides AI-generated answers with reliable source citations. Implemented Groq LLM, web scraping with Cheerio and Puppeteer, and optimized performance with rate limiting",
-                        technologies: ["Groq LLM", "Web Scraping", "Cheerio", "Puppeteer", "AI Search"],
-                        demo_link: "https://github.com/yuyi444/ai-search-engine",
-                        source_code_link: "https://github.com/yuyi444/ai-search-engine"
-                      },
-                      { 
-                        name: "We R Cooked", 
-                        emoji: "/images/project-icons/wercooked.png",
-                        description: "Implemented a creative simulation of Don Pollo incoming calls using ElevenLabs AI conversation widget integration. Integrated a Google T-rex replica game into application. Won Memenome Best Don Pollo Integration Hack, winning grand prize of 1k at jia.seed brainrot hackathon(1k+ participants)",
-                        technologies: ["ElevenLabs AI", "Game Integration", "Hackathon Winner", "AI Conversation"],
-                        demo_link: "https://github.com/yuyi444/we-r-cooked",
-                        source_code_link: "https://github.com/yuyi444/we-r-cooked"
-                      },
-                      { 
-                        name: "Healthcare AI RAG Tutoring System", 
-                        emoji: "/images/project-icons/aitutor.png",
-                        description: "AI Tutoring System, developed during Hack Research 2023 and took the 1st place win in AI Healthcare, is an innovative app that uses GPT-4 and advanced data extraction techniques to enhance healthcare education. By combining web scraping, embeddings, and retrieval-augmented generation, it sets a new standard for AI-driven learning tools in the medical field.",
-                        technologies: ["GPT-4", "Web Scraping", "Embeddings", "RAG", "Healthcare AI"],
-                        demo_link: "https://youtu.be/ReinaBoNaWo",
-                        source_code_link: "https://github.com/yuyi444/hack-research-proj.git"
-                      },
-                      { 
-                        name: "Bin Fiesta", 
-                        emoji: "/images/project-icons/binfiesta.png",
-                        description: "In Bin Fiesta, I developed a Google Gemini AI-powered chatbot that provides users with personalized recycling guidance, contributing to our 1st place win in Sustainability at Frontera Hacks. The project combines real-time AI interaction with a user-friendly interface built in Next.js, encouraging eco-friendly practices through accessible recycling information.",
-                        technologies: ["Google Gemini AI", "Next.js", "Chatbot", "Sustainability"],
-                        demo_link: "https://youtu.be/tXxWyIuusXI",
-                        source_code_link: "https://github.com/yuyi444/binfiesta.git"
-                      },
-                      { 
-                        name: "Balanced Perspective", 
-                        emoji: "/images/project-icons/newspaper.png",
-                        description: "The project, Balanced Perspective, aims to use deep learning for unbiased news summarization. By leveraging a CNN classifier to detect political bias and the PEGASUS transformer model for abstractive summarization, it produces summaries intended to present balanced perspectives across articles from different political spectrums.",
-                        technologies: ["Deep Learning", "CNN", "PEGASUS", "NLP", "News Analysis"],
-                        demo_link: "https://github.com/yuyi444/deep-learning-proj.git",
-                        source_code_link: "https://github.com/yuyi444/deep-learning-proj.git"
-                      },
-                      { 
-                        name: "SuperTux CNN Path Prediction", 
-                        emoji: "/images/project-icons/mario-kart.png",
-                        description: "I developed a Convolutional Neural Network that predicts a kart's driving path using visual inputs. Rather than going through segmentation and depth estimation, I predicted the lane boundaries in the vehicle's coordinate frame directly from the image, achieving optimal lateral and longitudinal error!",
-                        technologies: ["CNN", "Computer Vision", "Path Prediction", "Deep Learning"],
-                        demo_link: "https://github.com/yourusername/mario-kart-cnn",
-                        source_code_link: "https://github.com/yourusername/mario-kart-cnn"
-                      },
-                      { 
-                        name: "Album Database", 
-                        emoji: "/images/project-icons/albumdatabase.png",
-                        description: "This project focuses on transferring data from an original SQLite database to a new relational schema. It involves creating tables for musicians, albums, and instruments, importing data from a CSV, and setting up relationships between these tables to support efficient data retrieval and reporting.",
-                        technologies: ["SQLite", "Relational Database", "Data Migration", "CSV Import"],
-                        demo_link: "https://github.com/yuyi444/album-database.git",
-                        source_code_link: "https://github.com/yuyi444/album-database.git"
-                      },
-                      { 
-                        name: "Image Analysis and Interpolation with Fourier Transforms", 
-                        emoji: "/images/project-icons/ct_scan.png",
-                        description: "This project utilizes Fourier transforms to analyze and process a lung CT scan, extracting magnitude and phase spectrums and downsampling the image. Linear interpolation and zero-padding techniques are then applied to upsample the image, with mean squared error calculated to evaluate the quality of the interpolated images.",
-                        technologies: ["Fourier Transforms", "Image Processing", "CT Scan Analysis", "Interpolation"],
-                        demo_link: "https://github.com/yuyi444/digital-image-processing-proj.git",
-                        source_code_link: "https://github.com/yuyi444/digital-image-processing-proj.git"
-                      },
-                      { 
-                        name: "Rails Book System", 
-                        emoji: "/images/project-icons/booksystem.png",
-                        description: "I developed a book club management app providing the organizer, with full CRUD functionality to manage book suggestions, track reading status, and approve or reject recommendations from members. The app allows members to sign up, suggest books, and view read/unread lists, while the organizer can control the visibility of suggestions to maintain a high-quality selection process.",
-                        technologies: ["Ruby on Rails", "CRUD", "Book Management", "User Authentication"],
-                        demo_link: "https://youtu.be/Tg-l2x3FodU",
-                        source_code_link: "https://github.com/yuyi444/rails-book-system.git"
-                      },
-
-                    ].map((project, idx) => (
-                      <VStack
-                        key={idx}
-                        spacing={2}
-                        cursor="pointer"
-                        onClick={() => {
-                          const projectRoutes = {
-                            "AI Autotab Chrome Extension": "/projects/ai-autotab-chrome-extension",
-                            "AI Code Editor": "/projects/ai-code-editor",
-                            "AI Search Engine": "/projects/ai-search-engine",
-                            "We R Cooked": "/projects/we-r-cooked",
-                            "Healthcare AI RAG Tutoring System": "/projects/ai-tutoring-system",
-                            "Bin Fiesta": "/projects/bin-fiesta",
-                            "Balanced Perspective": "/projects/balanced-perspective",
-                            "SuperTux CNN Path Prediction": "/projects/mario-kart-cnn",
-                            "Album Database": "/projects/album-database",
-                            "Image Analysis and Interpolation with Fourier Transforms": "/projects/image-analysis",
-                            "Rails Book System": "/projects/rails-book-system",
-                            "Discord Bot": "/projects/discord-bot"
-                          };
-                          const route = projectRoutes[project.name as keyof typeof projectRoutes];
-                          if (route) {
-                            window.open(route, '_blank');
-                          }
-                        }}
-                        _hover={{ transform: 'scale(1.05)' }}
-                        transition="transform 0.2s"
-                      >
-                        {project.emoji.startsWith('/') ? (
-                          <Image src={project.emoji} alt={`${project.name} Icon`} width={48} height={48} />
-                        ) : (
-                          <Text fontSize="48px">{project.emoji}</Text>
-                        )}
-                        <Text fontSize="12px" fontWeight="bold" textAlign="center" color="#000">
-                          {project.name}
-                        </Text>
-                      </VStack>
-                    ))}
-                  </SimpleGrid>
+                  {CATEGORIES.map((category) => (
+                    <Box key={category}>
+                      <Text fontSize="13px" fontWeight="bold" color="#1A3CA7" borderBottom="1px solid #808080" mb={3}>
+                        {category}
+                      </Text>
+                      <SimpleGrid columns={[1, 2, 3]} spacing={4}>
+                        {projects.filter((p) => p.categories.includes(category)).map((project) => (
+                          <VStack
+                            key={project.source_code_link + project.name}
+                            spacing={2}
+                            cursor="pointer"
+                            onClick={() => window.open(projectHref(project), '_blank')}
+                            _hover={{ transform: 'scale(1.05)' }}
+                            transition="transform 0.2s"
+                          >
+                            <Image src={project.icon ?? DEFAULT_PROJECT_ICON} alt={`${project.name} Icon`} width={48} height={48} />
+                            <Text fontSize="12px" fontWeight="bold" textAlign="center" color="#000">
+                              {project.name}
+                            </Text>
+                          </VStack>
+                        ))}
+                      </SimpleGrid>
+                    </Box>
+                  ))}
                 </VStack>
               </Box>
             </Box>
           </Box>
-        </motion.div>
+        </WindowFrame>
       )}
 
 
 
+
+      {showGoogle && (
+        <GoogleSearchWindow onClose={() => setShowGoogle(false)} />
+      )}
 
       {showMinesweeper && (
         <MinesweeperWindow onClose={() => setShowMinesweeper(false)} />

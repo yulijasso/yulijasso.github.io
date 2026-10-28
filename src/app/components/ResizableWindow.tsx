@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import useIsMobile from '../hooks/useIsMobile';
 
 interface ResizableWindowProps {
   title: string;
@@ -36,6 +37,7 @@ const ResizableWindow: React.FC<ResizableWindowProps> = ({
   const [size, setSize] = useState({ width: initialWidth, height: initialHeight });
   const [isResizing, setIsResizing] = useState(false);
   const startPosRef = useRef({ x: 0, y: 0, width: 0, height: 0 });
+  const isMobile = useIsMobile();
 
   const handleResizeStart = useCallback((e: React.MouseEvent, direction: string) => {
     e.preventDefault();
@@ -74,23 +76,21 @@ const ResizableWindow: React.FC<ResizableWindowProps> = ({
     { position: 'se', cursor: 'se-resize', style: { bottom: -3, right: -3, width: 8, height: 8 } }
   ];
 
+  // On mobile, windows stack full-width in page order instead of floating at desktop coordinates.
+  const frameStyle: React.CSSProperties = isMobile
+    ? { position: 'relative', margin: '8px', zIndex, width: 'calc(100% - 16px)', height: Math.min(size.height, 520) }
+    : { position: 'absolute', top: initialTop, left: initialLeft, zIndex, width: size.width, height: size.height };
+
   return (
     <motion.div
-      drag={!isResizing}
+      drag={!isResizing && !isMobile}
       dragMomentum={false}
       dragElastic={0}
-      style={{
-        position: 'absolute',
-        top: initialTop,
-        left: initialLeft,
-        zIndex: zIndex,
-        width: size.width,
-        height: size.height
-      }}
+      style={frameStyle}
     >
       <Box
-        width={size.width}
-        height={size.height}
+        width="100%"
+        height="100%"
         bg="#C0C0C0"
         border="2px solid #808080"
         boxShadow="inset -2px -2px 0 #808080, inset 2px 2px 0 #FFFFFF"
@@ -156,7 +156,7 @@ const ResizableWindow: React.FC<ResizableWindowProps> = ({
           {children}
         </Box>
         {/* Resize Handles - Invisible corner handles */}
-        {resizeHandles.map((handle) => (
+        {!isMobile && resizeHandles.map((handle) => (
           <Box
             key={handle.position}
             position="absolute"

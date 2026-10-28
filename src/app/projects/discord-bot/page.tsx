@@ -57,7 +57,7 @@ export default function DiscordBotPage() {
                     fontSize="10px"
                     _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }}
                     leftIcon={<FaGithub />}
-                    onClick={() => window.open('https://github.com/yuyi444/discord-bot.git', '_blank')}
+                    onClick={() => window.open('https://github.com/yulijasso/discord-bot', '_blank')}
                   >
                     Source Code
                   </Button>

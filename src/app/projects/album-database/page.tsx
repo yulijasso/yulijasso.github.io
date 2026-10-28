@@ -59,7 +59,7 @@ export default function AlbumDatabasePage() {
                     fontSize="10px"
                     _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }}
                     leftIcon={<FaGithub />}
-                    onClick={() => window.open('https://github.com/yuyi444/album-database.git', '_blank')}
+                    onClick={() => window.open('https://github.com/yulijasso/album-database', '_blank')}
                   >
                     Source Code
                   </Button>
