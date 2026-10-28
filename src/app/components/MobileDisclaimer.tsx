@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Button, Text, VStack } from '@chakra-ui/react';
+import Image from 'next/image';
+import { Box, Button, Flex, HStack, Text, VStack } from '@chakra-ui/react';
 import RetroWindow from './RetroWindow';
 import useIsMobile from '../hooks/useIsMobile';
 
@@ -34,23 +35,43 @@ export default function MobileDisclaimer() {
       position="fixed"
       inset={0}
       zIndex={100}
-      bg="rgba(0, 0, 0, 0.4)"
+      bg="rgba(224, 33, 138, 0.35)"
       display="flex"
       alignItems="center"
       justifyContent="center"
       px={4}
     >
-      <Box w="100%" maxW="340px">
-        <RetroWindow title="⚠️ Heads up!" onClose={dismiss}>
-          <VStack spacing={4} fontFamily="'Microsoft Sans Serif', sans-serif" textAlign="center">
-            <Text fontSize="32px" lineHeight="1">🖥️</Text>
-            <Text fontSize="14px" fontWeight="bold" color="#000">
-              Best experienced on desktop
-            </Text>
-            <Text fontSize="12px" color="#333">
-              This portfolio is a 2000s-style desktop with draggable windows. You can browse it on mobile, but
-              visit on a computer for the full experience.
-            </Text>
+      <Box w="100%" maxW="340px" boxShadow="4px 4px 0 #808080">
+        <RetroWindow title="System Message" onClose={dismiss}>
+          <VStack spacing={4} fontFamily="'Microsoft Sans Serif', sans-serif" color="#000">
+            <HStack spacing={3} align="flex-start">
+              <Box flexShrink={0} pt={1}>
+                <Image src="/images/other/pixel-heart.png" alt="Pixel Heart" width={36} height={36} />
+              </Box>
+              <VStack spacing={2} align="flex-start">
+                <Text fontSize="13px" fontWeight="bold">
+                  This desktop was made for a bigger screen!
+                </Text>
+                <Text fontSize="12px" lineHeight="1.4">
+                  You can look around on your phone, but the draggable windows and games work best on a computer.
+                </Text>
+              </VStack>
+            </HStack>
+
+            <Flex
+              bg="#000"
+              color="#FFB3D6"
+              border="2px inset #808080"
+              px={2}
+              py={1}
+              fontSize="10px"
+              fontWeight="bold"
+              letterSpacing="1px"
+              userSelect="none"
+            >
+              ★ BEST VIEWED AT 1024×768 ★
+            </Flex>
+
             <Button
               size="md"
               bg="#E0E0E0"
@@ -59,10 +80,13 @@ export default function MobileDisclaimer() {
               borderRadius="0"
               fontFamily="'Microsoft Sans Serif', sans-serif"
               fontSize="12px"
+              minW="80px"
+              px={4}
+              py={2}
               _hover={{ border: '2px inset #808080', bg: '#D0D0D0' }}
               onClick={dismiss}
             >
-              Continue anyway
+              OK
             </Button>
           </VStack>
         </RetroWindow>
