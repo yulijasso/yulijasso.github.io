@@ -415,11 +415,11 @@ export default function Home() {
       pb="80px"
     >
       {isMobile ? (
-        <SimpleGrid columns={3} spacing={4} p={4} position="relative" zIndex={15} justifyItems="center">
+        <VStack spacing={4} p={4} position="relative" zIndex={15} align="flex-start">
           {desktopIcons.map((item) => (
             <DesktopIcon key={item.label} {...item} />
           ))}
-        </SimpleGrid>
+        </VStack>
       ) : (
         <Box position="relative" width="100vw" height="100vh" zIndex={15}>
           {desktopIcons.map((item, i) => (
