@@ -1,9 +1,11 @@
 export const CATEGORIES = [
   "AI",
+  "Generative AI",
   "Software Engineering",
   "Machine Learning",
   "Deep Learning",
   "Image Processing",
+  "Hackathons",
 ] as const;
 
 export type Category = (typeof CATEGORIES)[number];
@@ -11,10 +13,12 @@ export type Category = (typeof CATEGORIES)[number];
 // Short forms people search for, e.g. "ml" or "swe".
 export const CATEGORY_ALIASES: Record<Category, string[]> = {
   "AI": ["ai", "artificial intelligence"],
+  "Generative AI": ["genai", "gen ai", "generative ai"],
   "Software Engineering": ["swe", "software engineering"],
   "Machine Learning": ["ml", "machine learning"],
   "Deep Learning": ["dl", "deep learning"],
   "Image Processing": ["image processing"],
+  "Hackathons": ["hackathon", "hackathons", "hackathon winner"],
 };
 
 export interface Project {
@@ -23,11 +27,17 @@ export interface Project {
   // In-site detail page; projects without one open demo_link instead.
   route?: string;
   icon?: string;
+  // Display size for non-square logos; defaults to 48x48.
+  iconSize?: { width: number; height: number };
+  // Shown in the Projects desktop window and Google search.
+  desktop?: boolean;
   description: string;
   technologies: string[];
   demo_link: string;
   source_code_link: string;
 }
+
+export const DEFAULT_PROJECT_ICON = "/images/portfolio-icon.png";
 
 export const projects: Project[] = [
   {
@@ -35,6 +45,7 @@ export const projects: Project[] = [
     categories: ["AI"],
     route: "/projects/ai-autotab-chrome-extension",
     icon: "/images/project-icons/chromext.png",
+    desktop: true,
     description: "Created an AI Autotab chrome extension that autocompletes phrases and sentences, improving productivity",
     technologies: ["Chrome Extension", "AI", "Productivity", "JavaScript"],
     demo_link: "https://github.com/yulijasso/autotab-chrome-ext",
@@ -45,6 +56,7 @@ export const projects: Project[] = [
     categories: ["AI"],
     route: "/projects/ai-code-editor",
     icon: "/images/project-icons/aicodeditor.png",
+    desktop: true,
     description: "Integrated an AI tutor that improves user productivity and promotes in-platform learning in code editor app, Judge00. Integrated key features, such as OpenRouter API key input, line explanations, and automatic changes from AI tutor to IDE",
     technologies: ["AI Tutor", "Code Editor", "OpenRouter API", "IDE Integration"],
     demo_link: "https://aicode-editor.vercel.app/",
@@ -55,6 +67,7 @@ export const projects: Project[] = [
     categories: ["AI"],
     route: "/projects/ai-search-engine",
     icon: "/images/project-icons/searchengine.png",
+    desktop: true,
     description: "Created a tool that scrapes web content and provides AI-generated answers with reliable source citations. Implemented Groq LLM, web scraping with Cheerio and Puppeteer, and optimized performance with rate limiting",
     technologies: ["Groq LLM", "Web Scraping", "Cheerio", "Puppeteer", "AI Search"],
     demo_link: "https://webchat-lyart.vercel.app/",
@@ -62,9 +75,10 @@ export const projects: Project[] = [
   },
   {
     name: "We R Cooked",
-    categories: ["AI"],
+    categories: ["AI", "Hackathons"],
     route: "/projects/we-r-cooked",
     icon: "/images/project-icons/wercooked.png",
+    desktop: true,
     description: "Implemented a creative simulation of Don Pollo incoming calls using ElevenLabs AI conversation widget integration. Integrated a Google T-rex replica game into application. Won Memenome Best Don Pollo Integration Hack, winning grand prize of 1k at jia.seed brainrot hackathon(1k+ participants)",
     technologies: ["ElevenLabs AI", "Game Integration", "Hackathon Winner", "AI Conversation"],
     demo_link: "https://github.com/yulijasso/we-r-cooked",
@@ -72,9 +86,10 @@ export const projects: Project[] = [
   },
   {
     name: "Healthcare AI RAG Tutoring System",
-    categories: ["AI"],
+    categories: ["AI", "Hackathons"],
     route: "/projects/ai-tutoring-system",
     icon: "/images/project-icons/aitutor.png",
+    desktop: true,
     description: "AI Tutoring System, developed during Hack Research 2023 and took the 1st place win in AI Healthcare, is an innovative app that uses GPT-4 and advanced data extraction techniques to enhance healthcare education. By combining web scraping, embeddings, and retrieval-augmented generation, it sets a new standard for AI-driven learning tools in the medical field.",
     technologies: ["GPT-4", "Web Scraping", "Embeddings", "RAG", "Healthcare AI", "Hackathon Winner"],
     demo_link: "https://youtu.be/ReinaBoNaWo",
@@ -82,9 +97,10 @@ export const projects: Project[] = [
   },
   {
     name: "Bin Fiesta",
-    categories: ["AI"],
+    categories: ["AI", "Hackathons"],
     route: "/projects/bin-fiesta",
     icon: "/images/project-icons/binfiesta.png",
+    desktop: true,
     description: "In Bin Fiesta, I developed a Google Gemini AI-powered chatbot that provides users with personalized recycling guidance, contributing to our 1st place win in Sustainability at Frontera Hacks. The project combines real-time AI interaction with a user-friendly interface built in Next.js, encouraging eco-friendly practices through accessible recycling information.",
     technologies: ["Google Gemini AI", "Next.js", "Chatbot", "Sustainability", "Hackathon Winner"],
     demo_link: "https://youtu.be/tXxWyIuusXI",
@@ -92,9 +108,10 @@ export const projects: Project[] = [
   },
   {
     name: "Balanced Perspective",
-    categories: ["Deep Learning"],
+    categories: ["Machine Learning", "Deep Learning"],
     route: "/projects/balanced-perspective",
     icon: "/images/project-icons/newspaper.png",
+    desktop: true,
     description: "The project, Balanced Perspective, aims to use deep learning for unbiased news summarization. By leveraging a CNN classifier to detect political bias and the PEGASUS transformer model for abstractive summarization, it produces summaries intended to present balanced perspectives across articles from different political spectrums.",
     technologies: ["Deep Learning", "CNN", "PEGASUS", "NLP", "News Analysis"],
     demo_link: "https://github.com/yulijasso/deep-learning-proj",
@@ -102,9 +119,10 @@ export const projects: Project[] = [
   },
   {
     name: "SuperTux CNN Path Prediction",
-    categories: ["Deep Learning"],
+    categories: ["Machine Learning", "Deep Learning"],
     route: "/projects/mario-kart-cnn",
     icon: "/images/project-icons/mario-kart.png",
+    desktop: true,
     description: "I developed a Convolutional Neural Network that predicts a kart's driving path using visual inputs. Rather than going through segmentation and depth estimation, I predicted the lane boundaries in the vehicle's coordinate frame directly from the image, achieving optimal lateral and longitudinal error!",
     technologies: ["CNN", "Computer Vision", "Path Prediction", "Deep Learning"],
     demo_link: "https://github.com/yulijasso/online_deep_learning",
@@ -115,6 +133,7 @@ export const projects: Project[] = [
     categories: ["Software Engineering"],
     route: "/projects/album-database",
     icon: "/images/project-icons/albumdatabase.png",
+    desktop: true,
     description: "This project focuses on transferring data from an original SQLite database to a new relational schema. It involves creating tables for musicians, albums, and instruments, importing data from a CSV, and setting up relationships between these tables to support efficient data retrieval and reporting.",
     technologies: ["SQLite", "Relational Database", "Data Migration", "CSV Import"],
     demo_link: "https://github.com/yulijasso/album-database",
@@ -125,6 +144,7 @@ export const projects: Project[] = [
     categories: ["Image Processing"],
     route: "/projects/image-analysis",
     icon: "/images/project-icons/ct_scan.png",
+    desktop: true,
     description: "This project utilizes Fourier transforms to analyze and process a lung CT scan, extracting magnitude and phase spectrums and downsampling the image. Linear interpolation and zero-padding techniques are then applied to upsample the image, with mean squared error calculated to evaluate the quality of the interpolated images.",
     technologies: ["Fourier Transforms", "Image Processing", "CT Scan Analysis", "Interpolation"],
     demo_link: "https://github.com/yulijasso/digital-image-processing-proj",
@@ -135,6 +155,7 @@ export const projects: Project[] = [
     categories: ["Software Engineering"],
     route: "/projects/rails-book-system",
     icon: "/images/project-icons/booksystem.png",
+    desktop: true,
     description: "I developed a book club management app providing the organizer, with full CRUD functionality to manage book suggestions, track reading status, and approve or reject recommendations from members. The app allows members to sign up, suggest books, and view read/unread lists, while the organizer can control the visibility of suggestions to maintain a high-quality selection process.",
     technologies: ["Ruby on Rails", "CRUD", "Book Management", "User Authentication"],
     demo_link: "https://youtu.be/Tg-l2x3FodU",
@@ -161,7 +182,9 @@ export const projects: Project[] = [
   {
     name: "Researchella",
     categories: ["AI"],
-    icon: "/images/project-icons/searchengine.png",
+    icon: "/images/project-icons/researchella.webp",
+    iconSize: { width: 80, height: 35 },
+    desktop: true,
     description: "A NotebookLM-style AI research assistant. Upload PDFs, images, web pages, YouTube videos, or Drive files and chat with them using RAG with citations, or generate quizzes, flashcards, podcasts, reports, and mind maps.",
     technologies: ["Next.js", "RAG", "Pinecone", "GPT-4 Vision", "Clerk", "Upstash Redis", "Chakra UI"],
     demo_link: "https://researchella.vercel.app/",
@@ -195,17 +218,20 @@ export const projects: Project[] = [
     source_code_link: "https://github.com/yulijasso/stx-city-assist"
   },
   {
-    name: "City Connect Brand Website",
-    categories: ["Software Engineering"],
-    description: "Marketing site for City Connect, an AI-powered resident engagement platform with source-cited answers in English and Spanish. Includes a Book a Demo form that sends email through Brevo.",
-    technologies: ["Next.js", "TypeScript", "Chakra UI", "Brevo"],
+    name: "City Connect",
+    categories: ["Software Engineering", "AI"],
+    icon: "/images/project-icons/cityconnect.png",
+    desktop: true,
+    description: "City Connect is an AI-powered resident engagement platform that gives source-cited answers in English and Spanish. I mostly did the backend engineering, built the admin dashboard, and implemented role-based access control.",
+    technologies: ["Backend Engineering", "Admin Dashboard", "Role-Based Access Control", "Next.js", "TypeScript", "Clerk"],
     demo_link: "https://city-connect-brand-website.vercel.app",
     source_code_link: "https://github.com/yulijasso/city-connect-brand-website"
   },
   {
     name: "RAG Chatbot",
     categories: ["AI"],
-    icon: "/images/project-icons/searchengine.png",
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
     description: "A retrieval-augmented chatbot built on Next.js and the AI SDK, with file uploads, pgvector embeddings, LangChain document loaders, and Voyage AI for retrieval.",
     technologies: ["Next.js", "AI SDK", "RAG", "pgvector", "LangChain", "Voyage AI", "Drizzle"],
     demo_link: "https://rag-chatbot-yuliana-jassos-projects.vercel.app/",
@@ -264,8 +290,9 @@ export const projects: Project[] = [
   },
   {
     name: "NLP Question Answering",
-    categories: ["Deep Learning"],
-    icon: "/images/project-icons/newspaper.png",
+    categories: ["Machine Learning", "Deep Learning"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
     description: "A question-answering model trained on the SQuAD dataset with Hugging Face transformers, including answer-span extraction and named-entity helpers.",
     technologies: ["NLP", "Transformers", "Hugging Face", "SQuAD", "PyTorch"],
     demo_link: "https://github.com/yulijasso/nlp-project",
@@ -407,9 +434,100 @@ export const projects: Project[] = [
     technologies: ["Swift", "SwiftUI", "iOS"],
     demo_link: "https://github.com/yulijasso/photo-generator",
     source_code_link: "https://github.com/yulijasso/photo-generator"
+  },
+  {
+    name: "WGAN-GP Image Generation",
+    categories: ["Generative AI", "Machine Learning", "Deep Learning", "Image Processing"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "Trained a Wasserstein GAN with gradient penalty (WGAN-GP) on MNIST to generate handwritten digit images, using the gradient penalty to stabilize adversarial training.",
+    technologies: ["PyTorch", "WGAN-GP", "GANs", "MNIST", "Jupyter Notebook"],
+    demo_link: "https://github.com/yulijasso/wgan-gp-image-generation",
+    source_code_link: "https://github.com/yulijasso/wgan-gp-image-generation"
+  },
+  {
+    name: "Generative Adversarial Networks",
+    categories: ["Generative AI", "Machine Learning", "Deep Learning"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "Built and trained a generative adversarial network on a 2D toy distribution, visualizing how the generator learns to match the target data.",
+    technologies: ["PyTorch", "GANs", "Generative Models", "Jupyter Notebook"],
+    demo_link: "https://github.com/yulijasso/generative-adversarial-networks",
+    source_code_link: "https://github.com/yulijasso/generative-adversarial-networks"
+  },
+  {
+    name: "RealNVP Normalizing Flows",
+    categories: ["Generative AI", "Machine Learning", "Deep Learning"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "Implemented RealNVP, an invertible normalizing-flow model with affine coupling layers, for exact density estimation and sampling.",
+    technologies: ["PyTorch", "Normalizing Flows", "RealNVP", "Generative Models", "Jupyter Notebook"],
+    demo_link: "https://github.com/yulijasso/realnvp-normalizing-flows",
+    source_code_link: "https://github.com/yulijasso/realnvp-normalizing-flows"
+  },
+  {
+    name: "Multilayer Perceptron from Scratch",
+    categories: ["Generative AI", "Machine Learning", "Deep Learning"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "Built multilayer perceptrons from scratch with ReLU and sigmoid activations, MSE and Huber losses, and a gradient descent training loop, then studied how network depth and width affect training and test loss.",
+    technologies: ["Python", "PyTorch", "NumPy", "Neural Networks", "Gradient Descent", "Jupyter Notebook"],
+    demo_link: "https://github.com/yulijasso/multilayer-perceptron-from-scratch",
+    source_code_link: "https://github.com/yulijasso/multilayer-perceptron-from-scratch"
+  },
+  {
+    name: "Optimization Algorithms Comparison",
+    categories: ["Generative AI", "Machine Learning"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "Implemented gradient descent, momentum, RMSProp, Adam, and sign-based gradient descent from scratch, then compared their trajectories on a 2D non-convex function with two Gaussian wells to see which optimizers escape to the deeper minimum.",
+    technologies: ["Python", "NumPy", "Matplotlib", "Optimization", "Gradient Descent", "Adam", "Jupyter Notebook"],
+    demo_link: "https://github.com/yulijasso/optimization-algorithms-comparison",
+    source_code_link: "https://github.com/yulijasso/optimization-algorithms-comparison"
+  },
+  {
+    name: "Energy-Based Models with Langevin Sampling",
+    categories: ["Generative AI", "Machine Learning", "Deep Learning"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "Trained an energy-based model on a 2D toy problem and generated samples from it using Langevin dynamics.",
+    technologies: ["PyTorch", "Energy-Based Models", "Langevin Dynamics", "Generative Models", "Jupyter Notebook"],
+    demo_link: "https://github.com/yulijasso/energy-based-models-langevin-sampling",
+    source_code_link: "https://github.com/yulijasso/energy-based-models-langevin-sampling"
+  },
+  {
+    name: "Statewave Open Source Contribution",
+    categories: ["AI", "Software Engineering"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "Open source contribution to Statewave, a memory runtime for AI agents. Fixed the multi-agent shared-context demo so agents record each context read as an episode, letting the timeline inspector show its Agent Context Retrievals section and a real context-read count (fixes smaramwbc/statewave#485).",
+    technologies: ["Python", "Statewave", "Multi-Agent Systems", "Open Source"],
+    demo_link: "https://github.com/smaramwbc/statewave-multi-agent-shared-context/pull/7",
+    source_code_link: "https://github.com/yulijasso/statewave-multi-agent-shared-context"
+  },
+  {
+    name: "studentAssist",
+    categories: ["AI"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "A conversational AI assistant for colleagues, built in TypeScript on the CityAssist multi-tenant chatbot stack: a LangGraph agent with live web search behind an embeddable chat widget.",
+    technologies: ["TypeScript", "Next.js", "LangGraph", "LangChain", "Tavily"],
+    demo_link: "https://github.com/yulijasso/studentAssist",
+    source_code_link: "https://github.com/yulijasso/studentAssist"
+  },
+  {
+    name: "Claude Skills & Hooks for Open Source",
+    categories: ["AI"],
+    icon: DEFAULT_PROJECT_ICON,
+    desktop: true,
+    description: "Open Source AI Capstone (CodePath AI301): a toolkit of Claude Code skills and hooks that apply open source best practices, from picking an issue to reproducing it, planning the fix, and pre-checking the pull request. Each skill is backed by eval runs, and the toolkit was used to make a real open source contribution.",
+    technologies: ["Claude Code", "Skills", "Hooks", "Evals", "Open Source"],
+    demo_link: "https://github.com/yulijasso/ai301-coursework",
+    source_code_link: "https://github.com/yulijasso/ai301-coursework"
   }
 ];
 
-export const DEFAULT_PROJECT_ICON = "/images/portfolio-icon.png";
 
 export const projectHref = (project: Project) => project.route ?? project.demo_link;
+
+export const desktopProjects = projects.filter((p) => p.desktop);

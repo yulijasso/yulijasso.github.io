@@ -20,7 +20,7 @@ import RetroWindow from './components/RetroWindow';
 import GoogleSearchWindow from './components/GoogleSearchWindow';
 import WindowFrame from './components/WindowFrame';
 import useIsMobile from './hooks/useIsMobile';
-import { CATEGORIES, projects, projectHref, DEFAULT_PROJECT_ICON } from './data/projects';
+import { desktopProjects, projectHref } from './data/projects';
 
 interface Question {
   id: number;
@@ -520,30 +520,25 @@ export default function Home() {
                     </Text>
                   </Box>
                   
-                  {CATEGORIES.map((category) => (
-                    <Box key={category}>
-                      <Text fontSize="13px" fontWeight="bold" color="#1A3CA7" borderBottom="1px solid #808080" mb={3}>
-                        {category}
-                      </Text>
-                      <SimpleGrid columns={[1, 2, 3]} spacing={4}>
-                        {projects.filter((p) => p.categories.includes(category)).map((project) => (
-                          <VStack
-                            key={project.source_code_link + project.name}
-                            spacing={2}
-                            cursor="pointer"
-                            onClick={() => window.open(projectHref(project), '_blank')}
-                            _hover={{ transform: 'scale(1.05)' }}
-                            transition="transform 0.2s"
-                          >
-                            <Image src={project.icon ?? DEFAULT_PROJECT_ICON} alt={`${project.name} Icon`} width={48} height={48} />
-                            <Text fontSize="12px" fontWeight="bold" textAlign="center" color="#000">
-                              {project.name}
-                            </Text>
-                          </VStack>
-                        ))}
-                      </SimpleGrid>
-                    </Box>
-                  ))}
+                  <SimpleGrid columns={[1, 2, 3]} spacing={4}>
+                    {desktopProjects.map((project) => (
+                      <VStack
+                        key={project.name}
+                        spacing={2}
+                        cursor="pointer"
+                        onClick={() => window.open(projectHref(project), '_blank')}
+                        _hover={{ transform: 'scale(1.05)' }}
+                        transition="transform 0.2s"
+                      >
+                        <Flex h="48px" align="center">
+                          <Image src={project.icon!} alt={`${project.name} Icon`} width={project.iconSize?.width ?? 48} height={project.iconSize?.height ?? 48} />
+                        </Flex>
+                        <Text fontSize="12px" fontWeight="bold" textAlign="center" color="#000">
+                          {project.name}
+                        </Text>
+                      </VStack>
+                    ))}
+                  </SimpleGrid>
                 </VStack>
               </Box>
             </Box>
