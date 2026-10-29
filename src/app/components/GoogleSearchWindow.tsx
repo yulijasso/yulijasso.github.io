@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Box, Flex, HStack, Input, Text, VStack } from '@chakra-ui/react'
 import RetroWindow from './RetroWindow'
 import WindowFrame from './WindowFrame'
-import { CATEGORIES, CATEGORY_ALIASES, Category, projects, projectHref, Project } from '../data/projects'
+import { CATEGORIES, CATEGORY_ALIASES, Category, desktopProjects, projectHref, Project } from '../data/projects'
 
 interface GoogleSearchWindowProps {
   onClose: () => void;
@@ -53,7 +53,7 @@ const tokenize = (s: string) => s.toLowerCase().split(/\W+/).filter(Boolean)
 const termPattern = (terms: string[]) => new RegExp(`\\b(${terms.join('|')})`, 'gi')
 
 // Rank projects by how many query terms hit the name, technologies, and description.
-function searchProjects(query: string, pool: Project[] = projects): Project[] {
+function searchProjects(query: string, pool: Project[] = desktopProjects): Project[] {
   const terms = tokenize(query)
   if (terms.length === 0) return pool
   const patterns = terms.map((term) => new RegExp(`\\b${term}`, 'i'))
@@ -96,7 +96,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
   const [category, setCategory] = useState<Category | null>(null)
   const [elapsed, setElapsed] = useState('0.00')
 
-  const pool = category ? projects.filter((p) => p.categories.includes(category)) : projects
+  const pool = category ? desktopProjects.filter((p) => p.categories.includes(category)) : desktopProjects
   const results = query === null ? [] : searchProjects(query, pool)
 
   const tick = () => setElapsed((Math.random() * 0.2 + 0.03).toFixed(2))
@@ -192,7 +192,7 @@ export default function GoogleSearchWindow({ onClose }: GoogleSearchWindowProps)
               <VStack spacing={4} pt={12} pb={8}>
                 <GoogleLogo size="72px" />
                 {categoryTabs}
-                <Text fontSize="12px" color="#555">Searching Yuli&apos;s {projects.length} projects</Text>
+                <Text fontSize="12px" color="#555">Searching Yuli&apos;s {desktopProjects.length} projects</Text>
                 {searchBox('360px')}
                 <HStack spacing={2}>
                   <RetroButton onClick={() => runSearch(input)}>Google Search</RetroButton>
