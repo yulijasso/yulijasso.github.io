@@ -512,8 +512,8 @@ export const projects: Project[] = [
     desktop: true,
     description: "A conversational AI assistant for colleagues, built in TypeScript on the CityAssist multi-tenant chatbot stack: a LangGraph agent with live web search behind an embeddable chat widget.",
     technologies: ["TypeScript", "Next.js", "LangGraph", "LangChain", "Tavily"],
-    demo_link: "https://github.com/yulijasso/studentAssist",
-    source_code_link: "https://github.com/yulijasso/studentAssist"
+    demo_link: "https://github.com/smart8099/studentAssist",
+    source_code_link: "https://github.com/smart8099/studentAssist"
   },
   {
     name: "Claude Skills & Hooks for Open Source",
