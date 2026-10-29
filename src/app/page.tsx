@@ -369,7 +369,7 @@ export default function Home() {
     { icon: <Image src="/images/portfolio-icon.png" alt="Projects Icon" width={40} height={40} />, label: 'Projects', onClick: openPortfolio },
     { icon: <Image src="/images/contact-icon.png" alt="Contact Icon" width={40} height={40} />, label: 'Contact', onClick: openContact },
     { icon: <Image src="/images/minesweeper-icon.png" alt="Minesweeper Icon" width={40} height={40} />, label: 'Minesweeper', onClick: openMinesweeper },
-    { icon: <Image src="/images/google-chrome-icon.png" alt="Google Icon" width={40} height={40} />, label: 'Google', onClick: openGoogle },
+    { icon: <Image src="/images/google-chrome.png" alt="Google Chrome Icon" width={40} height={40} />, label: 'Google', onClick: openGoogle },
   ];
 
   const getScreen = () => {
